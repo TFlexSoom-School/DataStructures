@@ -12,6 +12,14 @@
 #define TYPE int
 #endif
 
+#ifndef LT
+#define LT(A, B) (A < B)
+#endif
+
+#ifndef EQ
+#define EQ(A, B) (A == B)
+#endif
+
 struct bin_tree;
 
 void init_tree(struct bin_tree*);

@@ -3,7 +3,7 @@
 
 EXE := prog
 FLAGS := -pedantic -ansi
-SOURCE_FILES := $(wildcard */*.c)
+SOURCE_FILES := $(wildcard */*.c) $(wildcard *.c)
 OBJECTS = $(SOURCE_FILES:%.c=%.o)
 
 all: $(EXE)
@@ -14,7 +14,7 @@ clean:
 
 
 .c.o:
-	gcc $(FLAGS) $< -o $@
+	gcc $(FLAGS) -c $< -o $@
 
 $(EXE): $(OBJECTS)
 	gcc $(FLAGS) $(OBJECTS) -o $@
