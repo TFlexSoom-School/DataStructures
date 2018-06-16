@@ -20,7 +20,11 @@
 #define EQ(A, B) (A == B)
 #endif
 
-struct bin_tree;
+struct avl_link;
+struct bin_tree{
+   struct avl_link * head;
+   int size;
+};
 
 void init_tree(struct bin_tree*);
 void add_tree(struct bin_tree*, TYPE);

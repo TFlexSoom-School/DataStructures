@@ -18,10 +18,6 @@ struct avl_link {
    struct avl_link* right;
 };
 
-struct bin_tree{
-   struct avl_link * head;
-   int size;
-};
 
 /* Struct Definitions END */
 
@@ -30,8 +26,10 @@ struct bin_tree{
 /* Function Prototypes */
 
 void _setHeight(struct avl_link*);
+int _compareHeight(struct avl_link*, struct avl_link*);
 struct avl_link * _balance(struct avl_link *);
-
+struct avl_link * _rotateLeft(struct avl_link*);
+struct avl_link * _rotateRight(struct avl_link*);
 
 /* End Function Prototypes */
 
@@ -42,7 +40,6 @@ struct avl_link * _balance(struct avl_link *);
 void init_tree(struct bin_tree* tree){
    assert(tree);
    tree->head = NULL;
-   assert(tree->head);
    tree->size = 0;
 }
 
@@ -66,12 +63,18 @@ struct avl_link * _add_node_r(struct avl_link* node, TYPE e){
    if(node){
       if(LT(e, node->data)){
          node->left = _add_node_r(node->left, e);
-	 node->left = _balance(node->left);
+	 return  _balance(node->left);
       }else
 	 node->right = _add_node_r(node->right, e);
-         node->right = _balance(node->right);
+         return _balance(node->right);
    }else{
-      return malloc(sizeof(struct avl_link*));
+      node = malloc(sizeof(struct avl_link));
+      assert(node);
+      node->data = e;
+      node->height = 0;
+      node->left = 0;
+      node->right = 0;
+      return node;
    }
 }
 
@@ -95,9 +98,9 @@ struct avl_link * remove_tree_r(struct avl_link* node, TYPE e){
       if(EQ(node->data, e)){
          return _new_data_remove(node);
       }else if(LT(e, node->data)){
-         remove_tree_r(node->left);
+         remove_tree_r(node->left, e);
       }else{
-         remove_tree_r(node->right);
+         remove_tree_r(node->right, e);
       }
       return _balance(node);
    }
@@ -161,19 +164,24 @@ void print_tree(struct bin_tree* tree){
    struct avl_link ** array;
    int arr_size = 0, i = 0;
    assert(tree);
-   array = malloc(sizeof(struct avl_link*) * (tree->size << 1));
+   array = malloc(sizeof(struct avl_link*) * (tree->size*2));
    assert (array);
+   for( i = 0; i < tree->size*2; i ++){
+      array[i] = 0;
+   }
+   i = 0;
    array[arr_size ++] = tree->head;
    while(i < arr_size){
-      printf("Node %d: %d |", i, array[i]->data); /* Should be %d %g not %d %d */
       if(array[i]){
+         printf("Node %d: %d |", i, array[i]->data); /* Should be %d %g not %d %d */
          array[arr_size ++] = array[i]->left;
 	 array[arr_size ++] = array[i]->right;
       }
 
-      if(i % (i >> 1) == 0){
+      /*if(i > 0 && i % (i >> 1) == 0){
          printf("\n");
-      }
+      }*/ printf("\n");
+      i++;
    }
    free(array);
 }
@@ -198,12 +206,14 @@ void del_tree(struct bin_tree* tree){
 	 array[arr_size ++] = array[i]->right;
       }
       free(array[i]);
+      i ++;
    }
    free(array);
    tree->size = 0;
    tree->head = NULL;
 }
 
+/* Sets height of the current node based off of its children */
 void _setHeight(struct avl_link* node){
    if(node->left == NULL && node->right == NULL){
       node->height = 0;
@@ -217,6 +227,7 @@ void _setHeight(struct avl_link* node){
       node->height = node->right->height + 1;
    }
 }
+
 struct avl_link * _balance(struct avl_link * node){
   if(node->left){
      _setHeight(node->left);
@@ -225,9 +236,59 @@ struct avl_link * _balance(struct avl_link * node){
      _setHeight(node->right);
   }
 
-  if(node->left->height - node->right->height > 1){
+  if(_compareHeight(node->left, node->right) <= -2){
      if(node->left){
-        if(node->left->left && node->left->right && node->left)
+        if(_compareHeight(node->left->left, node->left->right) >= 1){
+	   node->left = _rotateLeft(node->left);
+	}
+	return _rotateRight(node);
+     }
+  }else if(_compareHeight(node->left, node->right) >= 2){
+     if(node->right){
+        if(_compareHeight(node->right->left, node->right->right) <= -1){
+	   node->left = _rotateRight(node->left);
+	}
+	return _rotateLeft(node);
      }
   }
+}
+
+int _compareHeight(struct avl_link* a, struct avl_link* b){
+   if(a && b){
+      return a->height - b->height;
+   }else if(a){
+      return a->height > 0 ? -2 : 0; 
+   }else if(b){
+      return b->height > 0 ? 2: 0;
+   }else{
+      return 0;
+   }
+}
+
+
+/*
+ * rotate Functions:
+ * pre conditions -> Side is right or left heavy so
+ *    node and node->left or node->right is defined not NULL
+ *
+ */
+
+struct avl_link * _rotateLeft(struct avl_link* node){
+   struct avl_link * temp;
+   temp = node->right;
+   node->right = temp->left;
+   temp->left = node;
+   _setHeight(node);
+   _setHeight(temp);
+   return temp;
+}
+
+struct avl_link * _rotateRight(struct avl_link* node){
+   struct avl_link * temp;
+   temp = node->left;
+   node->left = temp->right;
+   temp->right = node;
+   _setHeight(node);
+   _setHeight(temp);
+   return temp;
 }
