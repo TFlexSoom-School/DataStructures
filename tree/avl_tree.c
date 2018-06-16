@@ -243,17 +243,19 @@ struct avl_link * _balance(struct avl_link * node){
   if(_compareHeight(node->left, node->right) <= -2){
      if(node->left){
         if(_compareHeight(node->left->left, node->left->right) >= 1){
-	   node->left = _rotateLeft(node->left);
-	}
-	return _rotateRight(node);
+	         node->left = _rotateLeft(node->left);
+	      }
+	      return _rotateRight(node);
      }
   }else if(_compareHeight(node->left, node->right) >= 2){
      if(node->right){
         if(_compareHeight(node->right->left, node->right->right) <= -1){
-	   node->left = _rotateRight(node->left);
-	}
-	return _rotateLeft(node);
+	         node->left = _rotateRight(node->left);
+	      }
+	      return _rotateLeft(node);
      }
+  }else{
+    return node;
   }
 }
 

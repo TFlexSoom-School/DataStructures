@@ -4,3 +4,6 @@
 *.o
 prog
 
+.vscode
+.vs
+
