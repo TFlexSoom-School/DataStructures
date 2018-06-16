@@ -63,10 +63,14 @@ struct avl_link * _add_node_r(struct avl_link* node, TYPE e){
    if(node){
       if(LT(e, node->data)){
          node->left = _add_node_r(node->left, e);
-	 return  _balance(node->left);
+	 printf("node->left %p\n", node->left);
+	 node->left = _balance(node->left);
+	 printf("node->left %p\n\n", node->left);
       }else
 	 node->right = _add_node_r(node->right, e);
-         return _balance(node->right);
+	 printf("node->right %p\n", node->right);
+         node->right = _balance(node->right);
+	 printf("node->right %p\n\n", node->right);
    }else{
       node = malloc(sizeof(struct avl_link));
       assert(node);
@@ -74,8 +78,8 @@ struct avl_link * _add_node_r(struct avl_link* node, TYPE e){
       node->height = 0;
       node->left = 0;
       node->right = 0;
-      return node;
    }
+   return node;
 }
 
 /*
@@ -178,9 +182,9 @@ void print_tree(struct bin_tree* tree){
 	 array[arr_size ++] = array[i]->right;
       }
 
-      /*if(i > 0 && i % (i >> 1) == 0){
+      if(i >= 0 && i % 16 == 0){
          printf("\n");
-      }*/ printf("\n");
+      }
       i++;
    }
    free(array);
