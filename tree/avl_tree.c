@@ -5,9 +5,16 @@
  *
  */
 
+/* For type information and bin tree interface */
 #include "binary_tree.h"
+
+/* For Print Function. Uses Print f assuming stdout stream */
 #include <stdio.h>
+
+/* For use of NULL */
 #include <stdlib.h>
+
+/* For use of assert function */
 #include <assert.h>
 
 /* Struct Definitions */
@@ -165,27 +172,36 @@ TYPE get_max(struct bin_tree* tree) {
 }
 
 /* Prints Breadth of Tree */
+void _format_spaces(int);
 void print_tree(struct bin_tree* tree) {
    struct avl_link ** array;
    int arr_size = 0, i = 0, j = 0;
    assert(tree);
-   array = malloc(sizeof(struct avl_link*) * (tree->size * 2));
-   assert(array);
+   
+   if(tree->head){
+      array = malloc(sizeof(struct avl_link*) * (4 << tree->head->height));
+      assert(array);
+   }else{
+      return; /* No tree to print */
+   }
+   
    for (i = 0; i < tree->size * 2; i++) {
       array[i] = 0;
    }
+   
    i = 0;
    array[arr_size++] = tree->head;
    while (i < arr_size) {
       if (array[i]) {
-	 printf("Node %d: %d | ", j++, array[i]->data); /* Should be %d %g not %d %d */
+	 printf("| %d |", array[i]->data); /* Should be %d %g not %d %d */
 	 array[arr_size++] = array[i]->left;
 	 array[arr_size++] = array[i]->right;
       }else{
-         printf("Node %d is NULL| ", j++);
+         printf("|NULL|");
       }
 
-      if (i >= 0 && i % 16 == 0) {
+      j = i + 2;
+      if (((((j << 1) - 1)^j) + 1)== j){ /* Is i a power of 2 */
 	 printf("\n");
       }
       i++;
@@ -205,18 +221,20 @@ void del_tree(struct bin_tree* tree) {
    struct avl_link ** array;
    int arr_size = 0, i = 0;
    assert(tree);
-   array = malloc(sizeof(struct avl_link*) * (tree->size << 1));
-   assert(array);
-   array[arr_size++] = tree->head;
-   while (i < arr_size) {
-      if (array[i]) {
-	 array[arr_size++] = array[i]->left;
-	 array[arr_size++] = array[i]->right;
+   if(tree->head){
+      array = malloc(sizeof(struct avl_link*) * (1 << tree->head->height + 2));
+      assert(array);
+      array[arr_size++] = tree->head;
+      while (i < arr_size) {
+	 if (array[i]) {
+	    array[arr_size++] = array[i]->left;
+	    array[arr_size++] = array[i]->right;
+	    free(array[i]);
+	 }
+	 i++;
       }
-      free(array[i]);
-      i++;
+      free(array);
    }
-   free(array);
    tree->size = 0;
    tree->head = NULL;
 }
@@ -239,6 +257,10 @@ void _setHeight(struct avl_link* node) {
    }
 }
 
+/* Balances the tree around the given node.
+ * Assumes that both left and right nodes have children
+ *    with correct heights 
+ */
 struct avl_link * _balance(struct avl_link * node) {
    if (node->left) {
       _setHeight(node->left);
@@ -267,6 +289,11 @@ struct avl_link * _balance(struct avl_link * node) {
    return node;
 }
 
+/* Compares the heights of the two nodes
+ *    Pos return means a is heavier
+ *    Neg return means b is heavier
+ *    |2| =< height means rotation
+ */
 int _compareHeight(struct avl_link* a, struct avl_link* b) {
    if (a && b) {
       return a->height - b->height;
@@ -309,3 +336,5 @@ struct avl_link * _rotateRight(struct avl_link* node) {
    _setHeight(temp);
    return temp;
 }
+
+/* End Function Definitions * ******************************/
