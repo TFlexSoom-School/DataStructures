@@ -33,5 +33,7 @@ TYPE get_min(struct bin_tree*);
 TYPE get_max(struct bin_tree*);
 void print_tree(struct bin_tree*);
 void del_tree(struct bin_tree*);
+int IS_AVL(struct bin_tree*);
+int IS_BIN_TREE(struct bin_tree*);
 
 #endif

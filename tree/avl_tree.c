@@ -222,13 +222,15 @@ void del_tree(struct bin_tree* tree) {
    int arr_size = 0, i = 0;
    assert(tree);
    if(tree->head){
-      array = malloc(sizeof(struct avl_link*) * (1 << tree->head->height + 2));
+      array = malloc(sizeof(struct avl_link*) * (tree->size));
       assert(array);
       array[arr_size++] = tree->head;
       while (i < arr_size) {
 	 if (array[i]) {
-	    array[arr_size++] = array[i]->left;
-	    array[arr_size++] = array[i]->right;
+	    if(array[i]->left)
+	       array[arr_size++] = array[i]->left;
+	    if(array[i]->right)
+	       array[arr_size++] = array[i]->right;
 	    free(array[i]);
 	 }
 	 i++;
@@ -335,6 +337,70 @@ struct avl_link * _rotateRight(struct avl_link* node) {
    _setHeight(node);
    _setHeight(temp);
    return temp;
+}
+
+int _r_is_avl(struct avl_link*);
+int IS_AVL(struct bin_tree* tree){
+   assert(tree);
+   return _r_is_avl(tree->head);
+}
+
+int _r_is_avl(struct avl_link* node){
+   int l, r;
+   /* Recursive Calls */
+   if(node){
+      l = _r_is_avl(node->left);
+      r = _r_is_avl(node->right);
+      if(l & r != 1){
+	 return 0;
+      }
+      if(node->left)
+	 _setHeight(node->left);
+      if(node->right)
+	 _setHeight(node->right);
+      l = _compareHeight(node->left, node->right);
+      if(l >= 2 || l <= -2){
+	 return 0;
+      }
+   }
+   return 1;
+}
+
+int IS_BIN_TREE(struct bin_tree* tree){
+   struct avl_link ** array;
+   struct bin_tree temp;
+   int arr_size = 0, i = 0;
+   assert(tree);
+   if(tree->head){
+      array = malloc(sizeof(struct avl_link*) * (tree->size));
+      assert(array);
+      array[arr_size++] = tree->head;
+      while (i < arr_size) {
+	 if (array[i]) {
+	    if(array[i]->left){
+	       temp.head = array[i]->left;
+	       if(!LT(get_max(&temp), array[i]->data)){
+		  free(array);
+		  return 0;
+	       }else{
+		  array[arr_size++] = array[i]->left;
+	       }
+	    }if(array[i]->right){
+	       temp.head = array[i]->right;
+	       if(!LT(array[i]->data, get_min(&temp))){
+		  free(array);
+		  return 0;
+	       }else{
+		  array[arr_size++] = array[i]->right;
+	       }
+	    }
+	    i++;
+	 }
+	 free(array);
+	 return 1;
+      }
+      return 0;
+   }
 }
 
 /* End Function Definitions * ******************************/

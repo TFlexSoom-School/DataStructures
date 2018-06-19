@@ -30,8 +30,7 @@ int main(int argc, char * argv[]) {
       print_tree(&a);
       printf("\n");
       remove_tree(&a, i);
-      print_tree(&a);
-      printf("The minimum Value is : %d\n\n", get_min(&a));
+      printf("It is a %d AVL_TREE but it is a %d BIN_TREE\n", IS_AVL(&a), IS_BIN_TREE(&a));
       del_tree(&a);
    }
    return 0;
