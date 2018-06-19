@@ -24,7 +24,6 @@ int main(int argc, char * argv[]) {
 		text_input = fopen(argv[1], "r");
 		while ((fscanf(text_input, "%i", &i)) != EOF) {
 			add_tree(&a, i);
-			printf("adding %d\n", i);
 		}
 		printf("\n\n");
 		fclose(text_input);
