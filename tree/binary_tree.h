@@ -35,5 +35,7 @@ void print_tree(struct bin_tree*);
 void del_tree(struct bin_tree*);
 int IS_AVL(struct bin_tree*);
 int IS_BIN_TREE(struct bin_tree*);
+int b_tree_contains(struct bin_tree*, TYPE);
+TYPE get_tree(struct bin_tree*, int);
 
 #endif
